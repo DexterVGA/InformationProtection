@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class FastExponentation {
+public class FastExponentiation {
     public static void main(String[] args) {
         int a, x, p;
         Scanner in = new Scanner(System.in);
@@ -11,6 +11,12 @@ public class FastExponentation {
         System.out.print("Input number p: ");
         p = in.nextInt();
 
+        int answer = exponentiation(a, x, p);
+
+        System.out.println("answer: " + answer % p);
+    }
+
+    public static int exponentiation(int a, int x, int p) {
         int n = log2(x) + 1; // count of iterations
 
         String binaryString = Integer.toString(x, 2); // приводим число в двоичную форму
@@ -27,7 +33,7 @@ public class FastExponentation {
             answer *= (int) Math.pow(array[i], binaryArr[i]); // сразу же перемножаем числа для ответа
         }
 
-        System.out.println("answer: " + answer % p);
+        return answer;
     }
 
     public static int log2(int x) {
