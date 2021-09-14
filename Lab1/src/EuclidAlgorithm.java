@@ -11,6 +11,13 @@ public class EuclidAlgorithm {
         int a = in.nextInt();
         System.out.print("Enter number \"b\": ");
         int b = in.nextInt();
+
+        int answer = euclid(a, b);
+
+        System.out.println("Answer: " + answer);
+    }
+
+    public static int euclid(int a, int b) {
         int[] arrU = new int[3];
         int[] arrV = new int[3];
         int[] arrBuffer = new int[3];
@@ -30,7 +37,9 @@ public class EuclidAlgorithm {
             //System.out.println();
         }
 
-        System.out.println("Answer is: " + arrU[0] + "\nx = " + arrU[1] + "\ny = " + arrU[2]);
+        //System.out.println("Answer is: " + arrU[0] + "\nx = " + arrU[1] + "\ny = " + arrU[2]);
+
+        return arrU[0];
     }
 
     public static void arrayInitialisation(int a, int b, int[] arrU, int[] arrV) {

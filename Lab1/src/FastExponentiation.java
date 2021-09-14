@@ -13,7 +13,7 @@ public class FastExponentiation {
 
         int answer = exponentiation(a, x, p);
 
-        System.out.println("answer: " + answer % p);
+        System.out.println("answer: " + answer);
     }
 
     public static int exponentiation(int a, int x, int p) {
@@ -33,7 +33,7 @@ public class FastExponentiation {
             answer *= (int) Math.pow(array[i], binaryArr[i]); // сразу же перемножаем числа для ответа
         }
 
-        return answer;
+        return answer % p;
     }
 
     public static int log2(int x) {
