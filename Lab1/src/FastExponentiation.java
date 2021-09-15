@@ -1,6 +1,9 @@
 import java.util.Scanner;
 
 public class FastExponentiation {
+    /**
+     * a^x mod p = y
+     */
     public static void main(String[] args) {
         int a, x, p;
         Scanner in = new Scanner(System.in);

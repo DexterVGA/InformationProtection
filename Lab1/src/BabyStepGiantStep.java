@@ -35,7 +35,8 @@ public class BabyStepGiantStep {
         // 1 <= i <= k
         int[] rowK = new int[k];
         for (int i = 1; i <= k; i++) {
-            rowK[i - 1] = (int)Math.pow(a, i * m) % p; // rowK is shifted 1 element to the left TODO use our method
+            // rowK[i - 1] = (int)Math.pow(a, i * m) % p; // rowK is shifted 1 element to the left TODO use our method
+            rowK[i - 1] = FastExponentiation.exponentiation(a, i * m, p);
         }
 
         // Ищем одинаковые элементы
