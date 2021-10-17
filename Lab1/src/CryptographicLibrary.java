@@ -2,6 +2,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CryptographicLibrary {
     /**
@@ -16,18 +17,18 @@ public class CryptographicLibrary {
         String binaryString = Long.toString(x, 2); // приводим число в двоичную форму
         int[] binaryArr = new int[n];
         for (int i = 0; i < binaryArr.length; i++) {
-            binaryArr[i] = Integer.parseInt(binaryString.substring(n-i-1, n-i)); // записываем в массив в обратном порядке
+            binaryArr[i] = Integer.parseInt(binaryString.substring(n - i - 1, n - i)); // записываем в массив в обратном порядке
         }
 
-        long[] array = new long[n];
-        array[0] = a;
-        long answer = (long) Math.pow(array[0], binaryArr[0]);
-        for (int i = 1; i < array.length; i++) { // в цикле прохидимся по алгоритму
-            array[i] = (long) Math.pow(array[i - 1], 2) % p;
-            answer *= (long) Math.pow(array[i], binaryArr[i]); // сразу же перемножаем числа для ответа
+        long s = a;
+        long answer = 1;
+        for (int i = 0; i < n; i++) { // в цикле прохидимся по алгоритму
+            if (binaryArr[i] == 1) {
+                answer = answer * s % p; // сразу же перемножаем числа для ответа
+            }
+            s = s * s % p;
         }
-
-        return answer % p;
+        return answer;
     }
 
     private static int log2(long x) {
@@ -63,9 +64,9 @@ public class CryptographicLibrary {
     }
 
     /**
-     * ???
+     * Diffie-Hellman
      */
-    public static void diffieHellman() { //TODO returning data type
+    public static void diffieHellman() {
         long[] arr = generateGeneralData();
         long P = arr[0]; // Безопасное простое число
         long g = arr[1]; // Первообразный корень по модулю P
@@ -77,7 +78,7 @@ public class CryptographicLibrary {
 
         long sharedSecretKeyZab = fastExponentiationModulo(publicKeyYb, privateKeyXa, P);
         long sharedSecretKeyZba = fastExponentiationModulo(publicKeyYa, privateKeyXb, P);
-        if(sharedSecretKeyZab != sharedSecretKeyZba) {
+        if (sharedSecretKeyZab != sharedSecretKeyZba) {
             System.err.println("Error in calculation");
         }
 
@@ -89,10 +90,12 @@ public class CryptographicLibrary {
      */
     public static long[] generateGeneralData() {
         // Specify min value of Q
-        long Q = 13; // Q - Prime
+        long Q = ThreadLocalRandom.current().
+                nextLong(Integer.MAX_VALUE >> 16, Integer.MAX_VALUE >> 2); // Q - Prime
         long P; // P = 2Q + 1
         // Specify min value of g
-        long g = 3; // (2 < g < P − 1) && (g^Q mod P != 1)
+        long g = ThreadLocalRandom.current().
+                nextLong(Integer.MAX_VALUE >> 22, Integer.MAX_VALUE >> 20); // (2 < g < P − 1) && (g^Q mod P != 1)
 
         boolean isPrimeP = false;
         while (!isPrimeP) {
@@ -118,7 +121,7 @@ public class CryptographicLibrary {
         }
         System.out.println("g = " + g);
 
-        return new long[] {P, g};
+        return new long[]{P, g};
     }
 
     public static boolean isPrime(long number) {
@@ -143,14 +146,13 @@ public class CryptographicLibrary {
         // 0 <= j <= m - 1
         long[] rowM = new long[m];
         for (int j = 0; j < m; j++) {
-            rowM[j] = ((long)Math.pow(a, j) * y) % p;
+            rowM[j] = ((long) Math.pow(a, j) * y) % p;
         }
 
         // a^im mod p
         // 1 <= i <= k
         long[] rowK = new long[k];
         for (int i = 1; i <= k; i++) {
-            // rowK[i - 1] = (int)Math.pow(a, i * m) % p; // rowK is shifted 1 element to the left TODO use our method
             rowK[i - 1] = fastExponentiationModulo(a, (long) i * m, p);
         }
 
