@@ -114,14 +114,38 @@ public class EncryptionLibrary {
         return CryptographicLibrary.fastExponentiationModulo(e, c, N);
     }
 
-    public static void encryptionVernam() {
+    public static void encryptionVernam(String message) {
+        int length = message.length();
+        char[] messageAsCharArray = message.toCharArray();
+        System.out.println("Source message: " + String.valueOf(messageAsCharArray));
 
+        char[] key = new char[length];
+        for (int i = 0; i < length; i++) {
+            key[i] = (char)ThreadLocalRandom.current().nextLong(0, 256);
+        }
+        System.out.println("Key: " + String.valueOf(key));
+
+        char[] encryptedMessage = new char[length];
+        for (int i = 0; i < length; i++) {
+            encryptedMessage[i] = (char)(messageAsCharArray[i] ^ key[i]);
+        }
+        System.out.println("Encrypted message: " + String.valueOf(encryptedMessage));
+
+        char[] decryptedMessage = new char[length];
+        for (int i = 0; i < length; i++) {
+            decryptedMessage[i] = (char)(encryptedMessage[i] ^ key[i]);
+        }
+        System.out.println("Decrypted message: " + String.valueOf(decryptedMessage));
     }
 
     public static void main(String[] args) {
         //encryptionShamir();
         //inputEncryptionShamirData();
         //System.out.println(encryptionElgamal(2));
-        System.out.println(encryptionRSA(12345));
+        //System.out.println(encryptionRSA(12345));
+        /*System.out.println((char)('a'^'j'));
+        System.out.println(97^106);
+        System.out.println((char)97);*/
+        encryptionVernam("I Love My Cat!");
     }
 }
