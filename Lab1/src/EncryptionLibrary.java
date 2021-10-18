@@ -91,8 +91,27 @@ public class EncryptionLibrary {
         return b * (CryptographicLibrary.fastExponentiationModulo(a, P - 1 - x, P)) % P;
     }
 
-    public static void encryptionRSA() {
+    public static long encryptionRSA(long message) { // message < N
+        long P = ThreadLocalRandom.current().
+                nextLong(2 << 6, Integer.MAX_VALUE >> 17); // P is big prime number
+        while (!CryptographicLibrary.isPrime(++P)) ;
+        long Q = ThreadLocalRandom.current().
+                nextLong(2 << 6, Integer.MAX_VALUE >> 17); // Q is big prime number
+        while (!CryptographicLibrary.isPrime(++Q) || Q == P) ;
 
+        long N = P * Q;
+        long Fi = (P - 1) * (Q - 1);
+        long d = ThreadLocalRandom.current().nextLong(11, Integer.MAX_VALUE >> 16);
+        while (CryptographicLibrary.generalizedEuclidAlgorithm(++d, Fi)[0] != 1 && d < Fi) ;
+        if (d == Fi) {
+            System.err.println("Не получилось сгенерировать число d.");
+            return -1;
+        }
+        long c = CryptographicLibrary.generalizedEuclidAlgorithm(Fi, d)[2]; // Инверсия cd mod Fi = 1
+        if (c < 0) c += Fi;
+
+        long e = CryptographicLibrary.fastExponentiationModulo(message, d, N);
+        return CryptographicLibrary.fastExponentiationModulo(e, c, N);
     }
 
     public static void encryptionVernam() {
@@ -102,7 +121,7 @@ public class EncryptionLibrary {
     public static void main(String[] args) {
         //encryptionShamir();
         //inputEncryptionShamirData();
-        System.out.println(encryptionElgamal(2));
-
+        //System.out.println(encryptionElgamal(2));
+        System.out.println(encryptionRSA(12345));
     }
 }
