@@ -9,16 +9,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EncryptionLibrary {
 
     public static void inputEncryptionShamirData() {
-        //String inFileName = "R://2.gif";
+        //String inFileName = "R://1.jpg";
         String inFileName = "R://temp.txt";
-        String outFileName = "R://newTemp";
+        String outFileName = "R://2.txt";
         List<Character> resultOfEncryption = new ArrayList<>();
 
         try (FileInputStream fileInputStream = new FileInputStream(inFileName)) {
             //System.out.printf("File size: %d bytes \n", fileInputStream.available());
             int currentByte; // 0-255
             while ((currentByte = fileInputStream.read()) != -1) {
-                resultOfEncryption.add((char)encryptionShamir(currentByte));
+                resultOfEncryption.add((char) encryptionShamir(currentByte));
                 //System.out.println((char)currentByte);
             }
         } catch (IOException ex) {
@@ -79,8 +79,16 @@ public class EncryptionLibrary {
         return x4;
     }
 
-    public static void encryptionElgamal() {
-
+    public static long encryptionElgamal(long message) { // message < P
+        long[] arr = CryptographicLibrary.generateGeneralData();
+        long P = arr[0]; // Безопасное простое число
+        long g = arr[1]; // Первообразный корень по модулю P
+        long x = ThreadLocalRandom.current().nextLong(2, P); // 1 < x < P
+        long y = CryptographicLibrary.fastExponentiationModulo(g, x, P);
+        long k = ThreadLocalRandom.current().nextLong(2, P - 1); // 1 < k < P - 1
+        long a = CryptographicLibrary.fastExponentiationModulo(g, k, P);
+        long b = message * (CryptographicLibrary.fastExponentiationModulo(y, k, P)) % P;
+        return b * (CryptographicLibrary.fastExponentiationModulo(a, P - 1 - x, P)) % P;
     }
 
     public static void encryptionRSA() {
@@ -93,8 +101,8 @@ public class EncryptionLibrary {
 
     public static void main(String[] args) {
         //encryptionShamir();
-        inputEncryptionShamirData();
-
+        //inputEncryptionShamirData();
+        System.out.println(encryptionElgamal(2));
 
     }
 }

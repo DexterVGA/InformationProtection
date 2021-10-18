@@ -108,7 +108,7 @@ public class CryptographicLibrary {
             }
         }
         P = 2L * Q + 1;
-        System.out.println("P && Q = " + P + ", " + Q);
+        //System.out.println("P && Q = " + P + ", " + Q);
 
         while (g < P - 1) {
             if (fastExponentiationModulo(g, Q, P) != 1) {
@@ -119,7 +119,7 @@ public class CryptographicLibrary {
         if (g == P - 1) {
             System.err.println("Exceptional situation!!!");
         }
-        System.out.println("g = " + g);
+        //System.out.println("g = " + g);
 
         return new long[]{P, g};
     }
