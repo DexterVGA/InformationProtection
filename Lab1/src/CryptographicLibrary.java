@@ -12,6 +12,12 @@ public class CryptographicLibrary {
      * Returns: long Y
      */
     public static long fastExponentiationModulo(long a, long x, long p) {
+        if (x < 0) {
+            a = CryptographicLibrary.generalizedEuclidAlgorithm(p, a)[2]; // find inverse of a
+            if (a < 0) a += p;
+            x *= -1;
+        }
+
         int n = log2(x) + 1; // count of iterations
 
         String binaryString = Long.toString(x, 2); // приводим число в двоичную форму
