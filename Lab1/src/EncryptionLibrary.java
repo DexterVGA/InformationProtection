@@ -2,37 +2,39 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EncryptionLibrary {
 
-    public static void inputEncryptionShamirData() {
-        //String inFileName = "R://1.jpg";
-        String inFileName = "R://temp.txt";
-        String outFileName = "R://2.txt";
-        List<Character> resultOfEncryption = new ArrayList<>();
-
+    public static void encryptFile(int choice, String inFileName, String outFileName) {
+        List<Integer> resultOfEncryption = new ArrayList<>();
         try (FileInputStream fileInputStream = new FileInputStream(inFileName)) {
             //System.out.printf("File size: %d bytes \n", fileInputStream.available());
             int currentByte; // 0-255
             while ((currentByte = fileInputStream.read()) != -1) {
-                resultOfEncryption.add((char) encryptionShamir(currentByte));
-                //System.out.println((char)currentByte);
+                switch (choice) {
+                    case 0 -> resultOfEncryption.add((int) encryptionShamir(currentByte));
+                    case 1 -> resultOfEncryption.add((int) encryptionElgamal(currentByte));
+                    case 2 -> resultOfEncryption.add((int) encryptionRSA(currentByte));
+                    case 3 -> resultOfEncryption.add(Integer.parseInt(encryptionVernam(String.valueOf(currentByte))));
+                    default -> {
+                        System.err.println("Unknown algo number");
+                        return;
+                    }
+                }
             }
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (char currentChar : resultOfEncryption) {
-            stringBuilder.append(currentChar);
+        byte[] array = new byte[resultOfEncryption.size()];
+        for (int i = 0; i < resultOfEncryption.size(); i++) {
+            array[i] = (byte) ((int) resultOfEncryption.get(i));
         }
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(outFileName)) {
-            byte[] buffer = stringBuilder.toString().getBytes();
-            fileOutputStream.write(buffer, 0, buffer.length);
+            fileOutputStream.write(array, 0, array.length);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -114,38 +116,45 @@ public class EncryptionLibrary {
         return CryptographicLibrary.fastExponentiationModulo(e, c, N);
     }
 
-    public static void encryptionVernam(String message) {
+    public static String encryptionVernam(String message) {
         int length = message.length();
         char[] messageAsCharArray = message.toCharArray();
-        System.out.println("Source message: " + String.valueOf(messageAsCharArray));
+        //System.out.println("Source message: " + String.valueOf(messageAsCharArray));
 
         char[] key = new char[length];
         for (int i = 0; i < length; i++) {
             key[i] = (char)ThreadLocalRandom.current().nextLong(0, 256);
         }
-        System.out.println("Key: " + String.valueOf(key));
+        //System.out.println("Key: " + String.valueOf(key));
 
         char[] encryptedMessage = new char[length];
         for (int i = 0; i < length; i++) {
             encryptedMessage[i] = (char)(messageAsCharArray[i] ^ key[i]);
         }
-        System.out.println("Encrypted message: " + String.valueOf(encryptedMessage));
+        //System.out.println("Encrypted message: " + String.valueOf(encryptedMessage));
 
         char[] decryptedMessage = new char[length];
         for (int i = 0; i < length; i++) {
             decryptedMessage[i] = (char)(encryptedMessage[i] ^ key[i]);
         }
-        System.out.println("Decrypted message: " + String.valueOf(decryptedMessage));
+        //System.out.println("Decrypted message: " + String.valueOf(decryptedMessage));
+
+        return String.valueOf(decryptedMessage);
     }
 
     public static void main(String[] args) {
         //encryptionShamir();
-        //inputEncryptionShamirData();
         //System.out.println(encryptionElgamal(2));
         //System.out.println(encryptionRSA(12345));
         /*System.out.println((char)('a'^'j'));
         System.out.println(97^106);
         System.out.println((char)97);*/
-        encryptionVernam("I Love My Cat!");
+//        encryptionVernam("I Love My Cat!");
+        //String inFileName = "R://1.jpg";
+        //String inFileName = "R://temp.txt";
+        //String outFileName = "R://2.txt";
+        String inFileName = "/Users/vadimgrebensikov/test.txt";
+        String outFileName = "/Users/vadimgrebensikov/out.txt";
+        encryptFile(3, inFileName, outFileName);
     }
 }
