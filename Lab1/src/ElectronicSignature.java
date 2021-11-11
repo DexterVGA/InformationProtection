@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -54,6 +55,12 @@ public class ElectronicSignature {
 
         // Alice -> Bob <m, s>
 
+        System.out.println(Arrays.toString(s));
+        writeByteArrayToFile("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature1", toByte(s));
+        byte[] newByteArray = fileToByteArray("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature1");
+        s = convertByteArrayToLongArray(newByteArray);
+        System.out.println(Arrays.toString(s));
+
         // Bob
 
         byte[] hB = digest.digest(message);
@@ -70,6 +77,36 @@ public class ElectronicSignature {
             }
         }
         System.out.println("RSA: Valid signature.");
+    }
+
+    public static byte[] toByte(long[] longArray) {
+        ByteBuffer bb = ByteBuffer.allocate(longArray.length * Long.BYTES);
+        bb.asLongBuffer().put(longArray);
+        return bb.array();
+    }
+
+    public static long[] convertByteArrayToLongArray(byte[] data) {
+        if (data == null || data.length % Long.BYTES != 0) return null;
+        long[] longs = new long[data.length / Long.BYTES];
+        for (int i = 0; i < longs.length; i++)
+            longs[i] = ( convertByteArrayToLong(new byte[] {
+                    data[(i*Long.BYTES)],
+                    data[(i*Long.BYTES)+1],
+                    data[(i*Long.BYTES)+2],
+                    data[(i*Long.BYTES)+3],
+                    data[(i*Long.BYTES)+4],
+                    data[(i*Long.BYTES)+5],
+                    data[(i*Long.BYTES)+6],
+                    data[(i*Long.BYTES)+7],
+            } ));
+        return longs;
+    }
+
+    private static long convertByteArrayToLong(byte[] longBytes){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
+        byteBuffer.put(longBytes);
+        byteBuffer.flip();
+        return byteBuffer.getLong();
     }
 
     public static int[] byteArrToIntArr(byte[] bArr) {
@@ -101,7 +138,7 @@ public class ElectronicSignature {
         long[] arr = CryptographicLibrary.generateGeneralData();
         long P = arr[0]; // Безопасное простое число
         long g = arr[1]; // Первообразный корень по модулю P
-        long x = ThreadLocalRandom.current().nextLong(2, P); // 1 < x < P
+        long x = ThreadLocalRandom.current().nextLong(2, P - 1); // 1 < x < P - 1
         long y = CryptographicLibrary.fastExponentiationModulo(g, x, P);
 
         // PUBLIC: P, g, y
@@ -136,6 +173,16 @@ public class ElectronicSignature {
         }
 
         // Alice -> Bob <m, r, s>
+        long[] tempS = new long[s.length + 1];
+        tempS[s.length] = r;
+        System.arraycopy(s, 0, tempS, 0, s.length);
+        System.out.println(Arrays.toString(tempS));
+        writeByteArrayToFile("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature2", toByte(tempS));
+        byte[] newByteArray = fileToByteArray("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature2");
+        long[] newLongArray= convertByteArrayToLongArray(newByteArray);
+        r = newLongArray[newLongArray.length - 1];
+        System.arraycopy(newLongArray, 0, s, 0, s.length);
+        System.out.println(Arrays.toString(newLongArray));
 
         byte[] hB = digest.digest(message);
         int[] intHB = byteArrToIntArr(hB);
@@ -202,16 +249,6 @@ public class ElectronicSignature {
             return;
         }
         byte[] hA = digest.digest(message);
-
-
-        // TODO Vadim
-        System.out.println(Arrays.toString(hA));
-        writeByteArrayToFile("R://Hello2.txt", hA);
-        hA = fileToByteArray("R://Hello2.txt");
-        System.out.println(Arrays.toString(hA));
-        // TODO Vadim
-
-
         int [] intHA = byteArrToIntArr(hA);
         long r;
         long[] s = new long[intHA.length];
@@ -235,6 +272,16 @@ public class ElectronicSignature {
         // r = 5;
         // s[0] = 3;
         // <m, r, s>
+        long[] tempS = new long[s.length + 1];
+        tempS[s.length] = r;
+        System.arraycopy(s, 0, tempS, 0, s.length);
+        System.out.println(Arrays.toString(tempS));
+        writeByteArrayToFile("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature3", toByte(tempS));
+        byte[] newByteArray = fileToByteArray("/Users/vadimgrebensikov/4 course/Information/Lab1/src/Signature3");
+        long[] newLongArray= convertByteArrayToLongArray(newByteArray);
+        r = newLongArray[newLongArray.length - 1];
+        System.arraycopy(newLongArray, 0, s, 0, s.length);
+        System.out.println(Arrays.toString(newLongArray));
 
         byte[] hB = digest.digest(message);
         int [] intHB = byteArrToIntArr(hB);
@@ -277,8 +324,8 @@ public class ElectronicSignature {
     }
 
     public static void main(String[] args) {
-        String inFileName = "R://Hello.txt";
-        //String outFileName = "R://Hello2.txt";
+        String inFileName = "/Users/vadimgrebensikov/4 course/Information/Lab1/src/Hello";
+        String outFileName = "/Users/vadimgrebensikov/4 course/Information/Lab1/src/Hello2";
         byte[] fileInBytes = fileToByteArray(inFileName);
         ElectronicSignature.RSA(fileInBytes);
         Elgamal(fileInBytes);
