@@ -299,7 +299,7 @@ public class ElectronicSignature {
 
         int[] inverseH = new int[intHB.length];
         for (int i = 0; i < inverseH.length; i++) {
-            inverseH[i] = (int) CryptographicLibrary.fastExponentiationModulo(intHB[i], -1, Q);
+            inverseH[i] = (int) CryptographicLibrary.fastExponentiationModulo(intHB[i], -1, Q); // Inverse throw Fast Exponentiation
         }
 
         long[] u1 = new long[intHB.length];
